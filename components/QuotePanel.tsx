@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { formatImpactPct, formatPremBps, truncateMint } from "@/lib/format";
+import { formatImpactPct, formatPremBps, isSolscanSig, truncateMint } from "@/lib/format";
 import type { UltraQuote } from "@/lib/quote";
 import type { TapeMint } from "@/lib/registry";
 
@@ -46,7 +46,11 @@ export function QuotePanel({
       ? "xStocks is a Backed tracker certificate. Not the listed share."
       : "Backpack Securities via Sunrise. Not the listed share.";
   const busy = swapState === "SIGNING" || swapState === "EXECUTING";
-  const canSwap = connected && state === "OK" && Boolean(quote?.outAmount) && !busy;
+  const canSwap =
+    connected &&
+    state === "OK" &&
+    Boolean(quote?.outAmount && quote.transaction && quote.requestId && quote.ticket) &&
+    !busy;
   const swapLabel = !connected
     ? "Connect wallet to swap"
     : swapState === "SIGNING"
@@ -125,7 +129,7 @@ export function QuotePanel({
         <p className="quote-error">{swapError}</p>
       ) : null}
 
-      {signature ? (
+      {signature && isSolscanSig(signature) ? (
         <p className="swap-sig">
           <a
             href={`https://solscan.io/tx/${signature}`}

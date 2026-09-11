@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { executeUltraOrder } from "@/lib/jupiter";
 import type { OrderHost, UltraExecuteResult } from "@/lib/quote";
 import { TAPE_MINTS_BY_MINT } from "@/lib/registry";
+import { verifyTicket } from "@/lib/ticket";
 
 export const dynamic = "force-dynamic";
 
@@ -33,11 +34,16 @@ export async function POST(req: NextRequest) {
   const o = body as Record<string, unknown>;
   const outputMint = typeof o.outputMint === "string" ? o.outputMint : "";
   const requestId = typeof o.requestId === "string" ? o.requestId.trim() : "";
+  const ticket = typeof o.ticket === "string" ? o.ticket.trim() : "";
   const signedTransaction =
     typeof o.signedTransaction === "string" ? o.signedTransaction.trim() : "";
 
-  if (!TAPE_MINTS_BY_MINT[outputMint]) return bad("unknown mint");
+  const row = TAPE_MINTS_BY_MINT[outputMint];
+  if (!row || !row.quoteEnabled) return bad("unknown mint");
   if (!requestId || requestId.length > 200) return bad("missing requestId");
+  if (!ticket || !verifyTicket(ticket, requestId, outputMint)) {
+    return bad("expired quote — request a new one");
+  }
   if (!signedTransaction || signedTransaction.length > 200_000) {
     return bad("missing signedTransaction");
   }

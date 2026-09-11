@@ -3,6 +3,7 @@ import "server-only";
 import { formatRawAmount } from "./format";
 import type { OrderHost, UltraExecuteResult, UltraQuote } from "./quote";
 import { QUOTE_USDC_RAW, TAPE_MINTS_BY_MINT, USDC_MINT } from "./registry";
+import { issueTicket } from "./ticket";
 
 export type { UltraExecuteResult, UltraQuote } from "./quote";
 
@@ -22,6 +23,7 @@ function emptyQuote(partial: Partial<UltraQuote> = {}): UltraQuote {
     routeLabel: null,
     requestId: null,
     transaction: null,
+    ticket: null,
     orderHost: null,
     error: null,
     usingLite: false,
@@ -104,6 +106,10 @@ function mapOrder(
     routeLabel: routeLabel(data),
     requestId: typeof data.requestId === "string" ? data.requestId : null,
     transaction: transactionOf(data),
+    ticket:
+      typeof data.requestId === "string" && data.requestId
+        ? issueTicket(data.requestId, outputMint)
+        : null,
     orderHost: host,
     error: outAmount ? null : apiError ?? "NO ROUTE",
     usingLite: host === "lite",

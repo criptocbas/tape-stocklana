@@ -9,7 +9,6 @@ import type { PricesPayload, TapePrice } from "@/lib/dexscreener";
 import type { UltraExecuteResult, UltraQuote } from "@/lib/quote";
 import { formatPubkey } from "@/lib/format";
 import { TAPE_MINTS, type TapeMint } from "@/lib/registry";
-import { decodeOrderTx, encodeSignedTx } from "@/lib/tx";
 
 const WalletButton = dynamic(
   () => import("@/components/WalletButton").then((m) => m.WalletButton),
@@ -96,6 +95,7 @@ export default function Page() {
           routeLabel: null,
           requestId: null,
           transaction: null,
+          ticket: null,
           orderHost: null,
           error: message,
           usingLite: false,
@@ -119,16 +119,20 @@ export default function Page() {
     setSwapError(null);
     setSignature(null);
     try {
-      const order = await loadQuote(row.mint, taker);
-      if (order.outAmount) {
-        setQuote(order);
-        setQuoteState("OK");
+      let order = quote;
+      if (!order?.transaction || !order.requestId || !order.ticket) {
+        order = await loadQuote(row.mint, taker);
+        if (order.outAmount) {
+          setQuote(order);
+          setQuoteState("OK");
+        }
       }
-      if (!order.transaction || !order.requestId) {
+      if (!order.transaction || !order.requestId || !order.ticket) {
         setSwapState("ERROR");
         setSwapError(order.error ?? "quote has no transaction — reconnect wallet");
         return;
       }
+      const { decodeOrderTx, encodeSignedTx } = await import("@/lib/tx");
       const tx = decodeOrderTx(order.transaction);
       const signed = await signTransaction(tx);
       const signedB64 = encodeSignedTx(signed);
@@ -139,6 +143,7 @@ export default function Page() {
         body: JSON.stringify({
           signedTransaction: signedB64,
           requestId: order.requestId,
+          ticket: order.ticket,
           outputMint: row.mint,
           host: order.orderHost,
         }),
@@ -156,7 +161,7 @@ export default function Page() {
       setSwapError(message);
       setSwapState("ERROR");
     }
-  }, [taker, signTransaction, selectedId]);
+  }, [taker, signTransaction, selectedId, quote]);
 
   useEffect(() => {
     setSwapState("IDLE");

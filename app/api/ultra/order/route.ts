@@ -14,6 +14,7 @@ function unknownMint(): UltraQuote {
     routeLabel: null,
     requestId: null,
     transaction: null,
+    ticket: null,
     orderHost: null,
     error: "unknown mint",
     usingLite: false,

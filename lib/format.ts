@@ -57,6 +57,10 @@ export function formatPremBps(bps: number | null | undefined): {
   return { text: `${sign}${bps.toFixed(1)} bps ${label}`, kind };
 }
 
+export function isSolscanSig(sig: string): boolean {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,128}$/.test(sig);
+}
+
 export function formatUtc(iso: string | null | undefined): string {
   if (!iso) return "—";
   const t = Date.parse(iso);

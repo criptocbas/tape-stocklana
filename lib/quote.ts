@@ -8,6 +8,7 @@ export type UltraQuote = {
   routeLabel: string | null;
   requestId: string | null;
   transaction: string | null;
+  ticket: string | null;
   orderHost: OrderHost | null;
   error: string | null;
   usingLite: boolean;
