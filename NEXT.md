@@ -10,5 +10,5 @@
 Judge backlog (do not invent products; these are polish on the locked tape):
 [x] M3 confirm: size, mint, issuer, prem, impact, then one signature. Solscan link after land.
 [x] STOP: 90s demo script in README (TSLAx vs MU, two issuers, prem, Ultra, US persons).
-[ ] After-hours: keep showing STALE instead of hiding prem. Honesty is the demo.
-[ ] Do not add Yahoo/Finnhub/charts/Ondo/Dark Tape.
+[x] After-hours: keep showing STALE instead of hiding prem. Honesty is the demo.
+[x] Do not add Yahoo/Finnhub/charts/Ondo/Dark Tape.

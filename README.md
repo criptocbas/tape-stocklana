@@ -16,7 +16,7 @@ Record this. Do not say “we built an AMM”, “you own the stock”, “Ondo 
 | 8–22s | **PREM** on TSLAx, then MU | On-chain vs the issuer mark (`stockData.price`). This is the number desks trade. STALE means the mark is older than 120s — we do not invent a print. |
 | 22–35s | Click TSLAx, then MU. Quote claim line | xStocks is a Backed tracker certificate. Backpack via Sunrise is a UCC-8 entitlement path. Neither is the listed share. |
 | 35–48s | Backpack Sep 10 listing panel, a canonical mint | Sunrise list, paste mint. We never search the ticker on a DEX. |
-| 48–75s | Connect Phantom/Backpack/Solflare → **Swap 10 USDC** → confirm (size, mint, issuer, prem, impact) → one signature → Solscan | Jupiter Ultra fill. Ten USDC, mainnet, one sign. Landed. |
+| 48–75s | Connect Phantom/Backpack/Solflare → **Swap 10 USDC** → confirm (size, mint, issuer, prem, impact) | Ten USDC, mainnet, one sign. If the wallet has USDC, land and open Solscan. If not, stop on the dialog — do not fake a receipt. |
 | 75–90s | Disclaimer, live URL | Not available to US persons. Market terminal, not a broker. End on tape-stocklana.vercel.app. |
 
 Demo names: **TSLAx** `XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB` and **MU** `MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1`.
