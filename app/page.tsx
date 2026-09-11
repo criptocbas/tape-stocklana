@@ -3,9 +3,11 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { ListingFeed } from "@/components/ListingFeed";
 import { QuotePanel, type QuoteState, type SwapState } from "@/components/QuotePanel";
 import { TapeTable, type PriceMap } from "@/components/TapeTable";
 import type { PricesPayload, TapePrice } from "@/lib/dexscreener";
+import type { ListingsPayload } from "@/lib/listings";
 import type { UltraExecuteResult, UltraQuote } from "@/lib/quote";
 import { formatPubkey } from "@/lib/format";
 import { TAPE_MINTS, type TapeMint } from "@/lib/registry";
@@ -40,6 +42,8 @@ export default function Page() {
   const [swapState, setSwapState] = useState<SwapState>("IDLE");
   const [signature, setSignature] = useState<string | null>(null);
   const [swapError, setSwapError] = useState<string | null>(null);
+  const [listings, setListings] = useState<ListingsPayload | null>(null);
+  const [listingsLoaded, setListingsLoaded] = useState(false);
   const fallbackTried = useRef(false);
 
   const selected = useMemo(() => mintById(selectedId), [selectedId]);
@@ -66,6 +70,28 @@ export default function Page() {
     };
     void load();
     const timer = window.setInterval(() => void load(), 15_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/listings", { cache: "no-store" });
+        const body = (await res.json()) as ListingsPayload;
+        if (cancelled || !body || !Array.isArray(body.rows)) return;
+        setListings(body);
+      } catch {
+        /* panel still renders the announcement copy */
+      } finally {
+        if (!cancelled) setListingsLoaded(true);
+      }
+    };
+    void load();
+    const timer = window.setInterval(() => void load(), 60_000);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
@@ -242,6 +268,8 @@ export default function Page() {
         swapError={swapError}
         onExecute={() => void executeSwap()}
       />
+
+      <ListingFeed data={listings} loaded={listingsLoaded} />
 
       <p className="disclaimer">
         Not available to US persons. Tokens are not the listed share. Not financial advice.

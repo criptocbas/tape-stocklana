@@ -10,6 +10,7 @@ TAPE is a live issuer-aware terminal for tokenized US equities on Solana. Same t
 2. Read **PREM** on TSLAx: basis points vs Jupiter `stockData` (issuer mark, not “you own Tesla”). STALE means the mark is older than 120s — we do not invent a print.
 3. Click TSLAx. Quote panel: 10 USDC → TSLAx, human out, impact, route, issuer claim line. Swap is disabled (quote only).
 4. Connect Phantom / Backpack / Solflare. Pubkey shows. **Swap 10 USDC** opens a confirm (size, mint, issuer, prem, impact). One signature. Solscan link after land. Mainnet only. Tiny size.
+5. Scroll to **Backpack Sep 10 batch**. Twenty canonical mints, Sunrise on-list check. Not on the tape. Never search the ticker on a DEX.
 
 ## Run
 

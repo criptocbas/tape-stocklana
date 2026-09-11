@@ -4,7 +4,7 @@
 [x] Judge: as-of + STALE when stockData.updatedAt > 120s. Never fake a mark.
 [x] Judge: README 60s path. Issuer claim line on the quote (not a second product).
 [x] M3: enable Ultra execute for connected wallet. Confirm dialog. Mainnet, tiny size.
-[ ] M4: new-listing feed (Backpack Sep 10 batch) as a separate panel.
+[x] M4: new-listing feed (Backpack Sep 10 batch) as a separate panel.
 [ ] STOP. Demo script + README. No more features.
 
 Judge backlog (do not invent products; these are polish on the locked tape):

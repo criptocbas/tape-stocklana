@@ -353,6 +353,38 @@ a {
   color: #c5ced6;
 }
 
+.listing-panel {
+  margin-top: 1.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid #1c2128;
+}
+
+.listing-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.listing-panel h2 {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-top: 0.2rem;
+}
+
+.listing-wrap {
+  margin-top: 0.85rem;
+}
+
+.listing-table tbody tr {
+  cursor: default;
+}
+
+.listing-table tbody tr:hover {
+  background: transparent;
+}
+
 .disclaimer {
   margin-top: 2rem;
   font-size: 0.72rem;
