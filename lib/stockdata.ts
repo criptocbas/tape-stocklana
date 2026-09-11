@@ -1,11 +1,9 @@
 import "server-only";
 
 import type { TapePrice } from "./dexscreener";
-import { TAPE_MINTS_BY_MINT } from "./registry";
 
 const PRICE_V3 = "https://api.jup.ag/price/v3";
 const PRICE_V3_LITE = "https://lite-api.jup.ag/price/v3";
-const XSTOCKS_QUOTE = "https://api.xstocks.fi/api/v2/public/assets";
 export const STALE_MS = 120_000;
 
 type StockData = {
@@ -87,21 +85,6 @@ async function fetchPriceV3(mints: string[]): Promise<Record<string, PriceV3Row>
   return null;
 }
 
-async function fetchXstocksQuote(symbol: string): Promise<number | null> {
-  try {
-    const res = await fetch(`${XSTOCKS_QUOTE}/${encodeURIComponent(symbol)}/price-data`, {
-      cache: "no-store",
-      headers: { accept: "application/json", "user-agent": "tape/0.1" },
-    });
-    if (!res.ok) return null;
-    const body: unknown = await res.json();
-    if (!body || typeof body !== "object" || Array.isArray(body)) return null;
-    return num((body as { quote?: unknown }).quote);
-  } catch {
-    return null;
-  }
-}
-
 export async function overlayStockData(rows: TapePrice[]): Promise<TapePrice[]> {
   if (rows.length === 0) return rows;
   const payload = await fetchPriceV3(rows.map((r) => r.mint));
@@ -113,7 +96,7 @@ export async function overlayStockData(rows: TapePrice[]): Promise<TapePrice[]> 
     }
   }
 
-  let next = rows.map((row) => {
+  return rows.map((row) => {
     const hit = payload?.[row.mint] ?? byLower.get(row.mint.toLowerCase());
     const stock = hit?.stockData;
     const underlyingUsd = num(stock?.price);
@@ -121,24 +104,4 @@ export async function overlayStockData(rows: TapePrice[]): Promise<TapePrice[]> 
     const updatedAt = typeof stock?.updatedAt === "string" ? stock.updatedAt : null;
     return applyMark(row, jupUsd ?? row.priceUsd, underlyingUsd, updatedAt, now);
   });
-
-  const missing = next
-    .map((row, i) => ({ row, i, meta: TAPE_MINTS_BY_MINT[row.mint] }))
-    .filter(
-      (x): x is { row: TapePrice; i: number; meta: NonNullable<typeof x.meta> } =>
-        x.row.underlyingUsd == null && x.meta?.issuer === "xstocks"
-    );
-
-  if (missing.length > 0) {
-    const quotes = await Promise.all(missing.map((x) => fetchXstocksQuote(x.meta.symbol)));
-    next = next.slice();
-    missing.forEach((x, idx) => {
-      const quote = quotes[idx];
-      if (quote == null) return;
-      const tokenUsd = next[x.i].priceUsd;
-      next[x.i] = applyMark(next[x.i], tokenUsd, quote, null, now);
-    });
-  }
-
-  return next;
 }
