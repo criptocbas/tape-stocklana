@@ -1,0 +1,42 @@
+export function formatUsd(n: number | null | undefined): string {
+  if (n == null || !Number.isFinite(n)) return "—";
+  const abs = Math.abs(n);
+  const sign = n < 0 ? "-" : "";
+  if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(2)}M`;
+  if (abs >= 10_000) return `${sign}$${(abs / 1_000).toFixed(1)}k`;
+  if (abs >= 1) return `${sign}$${abs.toFixed(2)}`;
+  if (abs === 0) return "$0.00";
+  return `${sign}$${abs.toPrecision(3)}`;
+}
+
+export function truncateMint(mint: string): string {
+  if (mint.length <= 10) return mint;
+  return `${mint.slice(0, 4)}…${mint.slice(-4)}`;
+}
+
+export function formatRawAmount(raw: string, decimals: number): string {
+  try {
+    const value = BigInt(raw);
+    if (decimals < 0) return raw;
+    const base = 10n ** BigInt(decimals);
+    const whole = value / base;
+    const frac = value % base;
+    if (frac === 0n) return whole.toString();
+    const fracStr = frac.toString().padStart(decimals, "0").replace(/0+$/, "");
+    return `${whole.toString()}.${fracStr}`;
+  } catch {
+    return "—";
+  }
+}
+
+export function formatImpactPct(n: number | null | undefined): string {
+  if (n == null || !Number.isFinite(n)) return "—";
+  const pct = Math.abs(n) <= 1 ? n * 100 : n;
+  const sign = pct > 0 ? "+" : "";
+  return `${sign}${pct.toFixed(4)}%`;
+}
+
+export function formatPubkey(pk: string): string {
+  if (pk.length <= 8) return pk;
+  return `${pk.slice(0, 4)}…${pk.slice(-4)}`;
+}

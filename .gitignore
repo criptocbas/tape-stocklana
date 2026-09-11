@@ -1,0 +1,28 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# next
+.next
+out
+
+# env
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+*.log
+npm-debug.log*
+.tsbuildinfo
+
+# sibling/nested worktrees
+tape-stocklana/
+
+# workspace planning docs (not part of the app)
+KICKOFF.md
+TAPE.md
