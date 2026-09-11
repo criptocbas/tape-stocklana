@@ -29,23 +29,6 @@ export function formatRawAmount(raw: string, decimals: number): string {
   }
 }
 
-export function premBps(
-  tokenUsd: number | null | undefined,
-  underlyingUsd: number | null | undefined
-): number | null {
-  if (tokenUsd == null || underlyingUsd == null) return null;
-  if (!Number.isFinite(tokenUsd) || !Number.isFinite(underlyingUsd) || underlyingUsd === 0) {
-    return null;
-  }
-  return (1e4 * (tokenUsd - underlyingUsd)) / underlyingUsd;
-}
-
-export function formatBps(n: number | null | undefined): string {
-  if (n == null || !Number.isFinite(n)) return "—";
-  const sign = n > 0 ? "+" : n < 0 ? "-" : "";
-  return `${sign}${Math.abs(n).toFixed(1)} bps`;
-}
-
 export function formatImpactPct(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return "—";
   const pct = Math.abs(n) <= 1 ? n * 100 : n;

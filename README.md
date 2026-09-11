@@ -29,7 +29,7 @@ Open [http://localhost:3000](http://localhost:3000). Connect Phantom, Backpack, 
 | `JUPITER_API_KEY` | **no** — route handler only | Optional. Set in `.env.local` and Vercel project env (Production + Preview). Never `NEXT_PUBLIC_*`. If unset, quotes use `https://lite-api.jup.ag/ultra/v1/order` and the panel shows `USING LITE API`. |
 | `BIRDEYE_API_KEY` | **no** — route handler only | Optional. Overlay DexScreener prices when set. Milestone 1 does not require it. |
 
-`JUPITER_API_KEY` is read only inside `app/api/ultra/order` (`lib/jupiter.ts` is `server-only`). Do not put it or `BIRDEYE_API_KEY` in `NEXT_PUBLIC_*` vars.
+`JUPITER_API_KEY` is read only on the server: `app/api/ultra/order` (`lib/jupiter.ts`) and `/api/prices` (`lib/stockdata.ts`). Do not put it or `BIRDEYE_API_KEY` in `NEXT_PUBLIC_*` vars.
 
 ## Mint registry (10)
 
