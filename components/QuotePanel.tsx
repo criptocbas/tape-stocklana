@@ -1,7 +1,7 @@
 "use client";
 
 import { formatImpactPct } from "@/lib/format";
-import type { UltraQuote } from "@/lib/jupiter";
+import type { UltraQuote } from "@/lib/quote";
 import type { TapeMint } from "@/lib/registry";
 
 export type QuoteState = "IDLE" | "QUOTING" | "OK" | "NO ROUTE" | "ERROR";

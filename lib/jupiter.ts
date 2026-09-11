@@ -1,21 +1,14 @@
+import "server-only";
+
 import { formatRawAmount } from "./format";
+import type { UltraQuote } from "./quote";
 import { QUOTE_USDC_RAW, TAPE_MINTS_BY_MINT, USDC_MINT } from "./registry";
+
+export type { UltraQuote } from "./quote";
 
 const ULTRA_ORDER = "https://api.jup.ag/ultra/v1/order";
 const LITE_ORDER = "https://lite-api.jup.ag/ultra/v1/order";
 const SWAP_V2_ORDER = "https://api.jup.ag/swap/v2/order";
-
-export type UltraQuote = {
-  outAmount: string | null;
-  outUi: string | null;
-  priceImpactPct: number | null;
-  slippageBps: number | null;
-  routeLabel: string | null;
-  requestId: string | null;
-  error: string | null;
-  usingLite: boolean;
-  needsApiKey: boolean;
-};
 
 function emptyQuote(partial: Partial<UltraQuote> = {}): UltraQuote {
   return {

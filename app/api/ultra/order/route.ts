@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { fetchUltraOrder, type UltraQuote } from "@/lib/jupiter";
+import { fetchUltraOrder } from "@/lib/jupiter";
+import type { UltraQuote } from "@/lib/quote";
 import { TAPE_MINTS_BY_MINT } from "@/lib/registry";
 
 export const dynamic = "force-dynamic";

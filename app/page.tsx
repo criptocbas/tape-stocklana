@@ -6,7 +6,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { QuotePanel, type QuoteState } from "@/components/QuotePanel";
 import { TapeTable, type PriceMap } from "@/components/TapeTable";
 import type { TapePrice } from "@/lib/dexscreener";
-import type { UltraQuote } from "@/lib/jupiter";
+import type { UltraQuote } from "@/lib/quote";
 import { formatPubkey } from "@/lib/format";
 import { TAPE_MINTS, type TapeMint } from "@/lib/registry";
 
