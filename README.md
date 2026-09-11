@@ -2,7 +2,7 @@
 
 TAPE is a live issuer-aware terminal for tokenized US equities on Solana. Same ticker can be two different claims — xStocks (Backed) and Backpack Securities / Sunrise — so every row is keyed by canonical mint, never by ticker search. Milestone 1 is quote-only: a 10-row tape plus a Jupiter Ultra quote for 10 USDC; swaps are not executed.
 
-**Live URL:** _pending — replace after Vercel deploy_
+**Live URL:** https://tape-stocklana.vercel.app
 
 ## Run
 
@@ -19,10 +19,10 @@ Open [http://localhost:3000](http://localhost:3000). Connect Phantom, Backpack, 
 | Variable | Client? | Purpose |
 |---|---|---|
 | `NEXT_PUBLIC_RPC_URL` | yes | Solana RPC for the wallet adapter. Defaults to `https://api.mainnet-beta.solana.com`. |
-| `JUPITER_API_KEY` | **no** — route handler only | Optional. If unset, quotes go through `https://lite-api.jup.ag/ultra/v1/order` and the panel shows `USING LITE API`. |
+| `JUPITER_API_KEY` | **no** — route handler only | Optional. Set in `.env.local` and Vercel project env (Production + Preview). Never `NEXT_PUBLIC_*`. If unset, quotes use `https://lite-api.jup.ag/ultra/v1/order` and the panel shows `USING LITE API`. |
 | `BIRDEYE_API_KEY` | **no** — route handler only | Optional. Overlay DexScreener prices when set. Milestone 1 does not require it. |
 
-Do not put `JUPITER_API_KEY` or `BIRDEYE_API_KEY` in `NEXT_PUBLIC_*` vars.
+`JUPITER_API_KEY` is read only inside `app/api/ultra/order` (`lib/jupiter.ts` is `server-only`). Do not put it or `BIRDEYE_API_KEY` in `NEXT_PUBLIC_*` vars.
 
 ## Mint registry (10)
 
