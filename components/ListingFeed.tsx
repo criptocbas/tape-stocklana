@@ -58,17 +58,20 @@ export function ListingFeed({
                   </a>
                 </td>
                 <td className="venue">
-                  {row.spoof ? (
-                    <span className="stale-tag">SPOOF</span>
+                  {!loaded ? (
+                    "…"
                   ) : row.onSunrise ? (
                     "ON-LIST"
-                  ) : loaded && data?.sunriseOk ? (
+                  ) : data?.sunriseOk ? (
                     "MISSING"
-                  ) : loaded ? (
-                    "—"
                   ) : (
-                    "…"
+                    "—"
                   )}
+                  {row.spoof ? (
+                    <span className="stale-tag" title="Another mint on Sunrise uses this ticker">
+                      SPOOF
+                    </span>
+                  ) : null}
                 </td>
               </tr>
             ))}
