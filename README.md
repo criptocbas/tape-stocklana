@@ -1,8 +1,15 @@
 # TAPE
 
-TAPE is a live issuer-aware terminal for tokenized US equities on Solana. Same ticker can be two different claims — xStocks (Backed) and Backpack Securities / Sunrise — so every row is keyed by canonical mint, never by ticker search. Milestone 1 is quote-only: a 10-row tape plus a Jupiter Ultra quote for 10 USDC; swaps are not executed.
+TAPE is a live issuer-aware terminal for tokenized US equities on Solana. Same ticker can be two different claims — xStocks (Backed) and Backpack Securities / Sunrise — so every row is keyed by canonical mint, never by ticker search. Milestone 1–2 is quote-only: a 10-row tape, prem/disc vs the issuer mark, and a Jupiter Ultra quote for 10 USDC; swaps are not executed.
 
 **Live URL:** https://tape-stocklana.vercel.app
+
+## Judge path (60s)
+
+1. Open the live URL. Ten rows, two issuer badges (xStocks amber, Backpack violet).
+2. Read **PREM** on TSLAx: basis points vs Jupiter `stockData` (issuer mark, not “you own Tesla”). STALE means the mark is older than 120s — we do not invent a print.
+3. Click TSLAx. Quote panel: 10 USDC → TSLAx, human out, impact, route, issuer claim line. Swap is disabled (quote only).
+4. Connect Phantom / Backpack / Solflare. Pubkey shows. Quote still does not execute.
 
 ## Run
 
@@ -42,6 +49,8 @@ Demo mint: **TSLAx** (`TSLA:xstocks`).
 | GRND | Backpack | `GRNDYDpqwpCm6jVxpbh4xT5AM4r3p391qYsKTHqgaET2` |
 
 Source of truth: `lib/registry.ts`.
+
+**PREM** = `1e4 × (Jupiter usdPrice − stockData.price) / stockData.price`. Tape last (PX / VOL / LIQ) is DexScreener (highest `liquidity.usd`). If `stockData` is missing, PREM is `—`. Never a fake mark.
 
 ## Disclaimer
 

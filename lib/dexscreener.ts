@@ -3,6 +3,15 @@ export type TapePrice = {
   priceUsd: number | null;
   volume24h: number | null;
   liquidityUsd: number | null;
+  underlyingUsd: number | null;
+  premBps: number | null;
+  stockUpdatedAt: string | null;
+  stale: boolean;
+};
+
+export type PricesPayload = {
+  prices: TapePrice[];
+  fetchedAt: number;
 };
 
 type DexPair = {
@@ -28,6 +37,10 @@ function empty(mints: string[]): TapePrice[] {
     priceUsd: null,
     volume24h: null,
     liquidityUsd: null,
+    underlyingUsd: null,
+    premBps: null,
+    stockUpdatedAt: null,
+    stale: false,
   }));
 }
 
@@ -71,13 +84,26 @@ export async function fetchDexPrices(mints: string[]): Promise<TapePrice[]> {
   return mints.map((mint) => {
     const hit = best.get(mint) ?? lower.get(mint.toLowerCase());
     if (!hit) {
-      return { mint, priceUsd: null, volume24h: null, liquidityUsd: null };
+      return {
+        mint,
+        priceUsd: null,
+        volume24h: null,
+        liquidityUsd: null,
+        underlyingUsd: null,
+        premBps: null,
+        stockUpdatedAt: null,
+        stale: false,
+      };
     }
     return {
       mint,
       priceUsd: hit.priceUsd,
       volume24h: hit.volume24h,
       liquidityUsd: hit.liq > 0 ? hit.liq : null,
+      underlyingUsd: null,
+      premBps: null,
+      stockUpdatedAt: null,
+      stale: false,
     };
   });
 }

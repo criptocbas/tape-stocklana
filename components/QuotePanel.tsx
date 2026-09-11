@@ -1,6 +1,6 @@
 "use client";
 
-import { formatImpactPct } from "@/lib/format";
+import { formatImpactPct, formatPremBps } from "@/lib/format";
 import type { UltraQuote } from "@/lib/quote";
 import type { TapeMint } from "@/lib/registry";
 
@@ -10,10 +10,14 @@ export function QuotePanel({
   mint,
   state,
   quote,
+  premBps,
+  stale,
 }: {
   mint: TapeMint;
   state: QuoteState;
   quote: UltraQuote | null;
+  premBps: number | null;
+  stale: boolean;
 }) {
   const outUi = quote?.outUi ?? "—";
   const impact = formatImpactPct(quote?.priceImpactPct);
@@ -23,6 +27,11 @@ export function QuotePanel({
     : quote?.usingLite
       ? "USING LITE API"
       : null;
+  const prem = formatPremBps(premBps);
+  const claim =
+    mint.issuer === "xstocks"
+      ? "xStocks is a Backed tracker certificate. Not the listed share."
+      : "Backpack Securities via Sunrise. Not the listed share.";
 
   return (
     <section className="quote-panel" aria-live="polite">
@@ -40,6 +49,8 @@ export function QuotePanel({
 
       {banner ? <p className="quote-banner">{banner}</p> : null}
 
+      <p className="quote-claim">{claim}</p>
+
       <dl className="quote-grid">
         <div>
           <dt>out</dt>
@@ -52,6 +63,13 @@ export function QuotePanel({
         <div>
           <dt>route</dt>
           <dd className="num">{state === "QUOTING" ? "…" : route}</dd>
+        </div>
+        <div>
+          <dt>prem vs mark</dt>
+          <dd className={`num prem is-${prem.kind}`}>
+            {prem.text}
+            {stale ? <span className="stale-tag">STALE</span> : null}
+          </dd>
         </div>
       </dl>
 

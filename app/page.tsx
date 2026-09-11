@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { QuotePanel, type QuoteState } from "@/components/QuotePanel";
 import { TapeTable, type PriceMap } from "@/components/TapeTable";
-import type { TapePrice } from "@/lib/dexscreener";
+import type { PricesPayload, TapePrice } from "@/lib/dexscreener";
 import type { UltraQuote } from "@/lib/quote";
 import { formatPubkey } from "@/lib/format";
 import { TAPE_MINTS, type TapeMint } from "@/lib/registry";
@@ -34,6 +34,7 @@ export default function Page() {
   const [selectedId, setSelectedId] = useState(DEFAULT_ID);
   const [prices, setPrices] = useState<PriceMap>({});
   const [pricesLoaded, setPricesLoaded] = useState(false);
+  const [fetchedAt, setFetchedAt] = useState<number | null>(null);
   const [quote, setQuote] = useState<UltraQuote | null>(null);
   const [quoteState, setQuoteState] = useState<QuoteState>("IDLE");
   const fallbackTried = useRef(false);
@@ -43,22 +44,28 @@ export default function Page() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/prices")
-      .then(async (res) => {
-        const rows = (await res.json()) as TapePrice[];
+    const load = async () => {
+      try {
+        const res = await fetch("/api/prices", { cache: "no-store" });
+        const body = (await res.json()) as PricesPayload | TapePrice[];
+        const rows = Array.isArray(body) ? body : body.prices;
+        const at = Array.isArray(body) ? Date.now() : body.fetchedAt;
         if (cancelled || !Array.isArray(rows)) return;
         const map: PriceMap = {};
         for (const row of rows) map[row.mint] = row;
         setPrices(map);
-      })
-      .catch(() => {
+        setFetchedAt(at);
+      } catch {
         /* rows still render from the registry */
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setPricesLoaded(true);
-      });
+      }
+    };
+    void load();
+    const timer = window.setInterval(() => void load(), 15_000);
     return () => {
       cancelled = true;
+      window.clearInterval(timer);
     };
   }, []);
 
@@ -152,10 +159,17 @@ export default function Page() {
         prices={prices}
         pricesLoaded={pricesLoaded}
         selectedId={selectedId}
+        fetchedAt={fetchedAt}
         onSelect={(row) => setSelectedId(row.id)}
       />
 
-      <QuotePanel mint={selected} state={quoteState} quote={quote} />
+      <QuotePanel
+        mint={selected}
+        state={quoteState}
+        quote={quote}
+        premBps={prices[selected.mint]?.premBps ?? null}
+        stale={prices[selected.mint]?.stale ?? false}
+      />
 
       <p className="disclaimer">
         Not available to US persons. Tokens are not the listed share. Not financial advice.

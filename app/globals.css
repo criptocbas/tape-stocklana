@@ -241,7 +241,7 @@ a {
 
 .quote-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -315,6 +315,49 @@ a {
   border-radius: 0 !important;
 }
 
+.prem.is-prem {
+  color: #e8b86d;
+}
+
+.prem.is-disc {
+  color: #7dcea0;
+}
+
+.prem.is-flat,
+.prem.is-none {
+  color: #8b98a5;
+}
+
+.stale-tag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: #e07a7a;
+  border: 1px solid #4a2c2c;
+  padding: 0.05rem 0.3rem;
+  vertical-align: middle;
+}
+
+.tape-meta,
+.quote-claim {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: #5c6770;
+}
+
+.quote-claim {
+  margin-top: 0.7rem;
+}
+
+@media (max-width: 960px) {
+  .quote-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   .quote-grid {
     grid-template-columns: 1fr;
@@ -322,5 +365,13 @@ a {
 
   .wordmark {
     font-size: 1.7rem;
+  }
+
+  .tape-wrap {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tape-meta::after {
+    content: " · scroll table → PREM";
   }
 }
