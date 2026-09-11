@@ -13,6 +13,8 @@ function unknownMint(): UltraQuote {
     slippageBps: null,
     routeLabel: null,
     requestId: null,
+    transaction: null,
+    orderHost: null,
     error: "unknown mint",
     usingLite: false,
     needsApiKey: false,

@@ -3,7 +3,7 @@
 [x] M2: premium/discount vs underlying for the 10 names. One extra column. No new products.
 [x] Judge: as-of + STALE when stockData.updatedAt > 120s. Never fake a mark.
 [x] Judge: README 60s path. Issuer claim line on the quote (not a second product).
-[ ] M3: enable Ultra execute for connected wallet. Confirm dialog. Mainnet, tiny size.
+[x] M3: enable Ultra execute for connected wallet. Confirm dialog. Mainnet, tiny size.
 [ ] M4: new-listing feed (Backpack Sep 10 batch) as a separate panel.
 [ ] STOP. Demo script + README. No more features.
 

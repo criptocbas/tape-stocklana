@@ -3,12 +3,13 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { QuotePanel, type QuoteState } from "@/components/QuotePanel";
+import { QuotePanel, type QuoteState, type SwapState } from "@/components/QuotePanel";
 import { TapeTable, type PriceMap } from "@/components/TapeTable";
 import type { PricesPayload, TapePrice } from "@/lib/dexscreener";
-import type { UltraQuote } from "@/lib/quote";
+import type { UltraExecuteResult, UltraQuote } from "@/lib/quote";
 import { formatPubkey } from "@/lib/format";
 import { TAPE_MINTS, type TapeMint } from "@/lib/registry";
+import { decodeOrderTx, encodeSignedTx } from "@/lib/tx";
 
 const WalletButton = dynamic(
   () => import("@/components/WalletButton").then((m) => m.WalletButton),
@@ -30,13 +31,16 @@ async function loadQuote(outputMint: string, taker?: string): Promise<UltraQuote
 }
 
 export default function Page() {
-  const { publicKey } = useWallet();
+  const { publicKey, signTransaction } = useWallet();
   const [selectedId, setSelectedId] = useState(DEFAULT_ID);
   const [prices, setPrices] = useState<PriceMap>({});
   const [pricesLoaded, setPricesLoaded] = useState(false);
   const [fetchedAt, setFetchedAt] = useState<number | null>(null);
   const [quote, setQuote] = useState<UltraQuote | null>(null);
   const [quoteState, setQuoteState] = useState<QuoteState>("IDLE");
+  const [swapState, setSwapState] = useState<SwapState>("IDLE");
+  const [signature, setSignature] = useState<string | null>(null);
+  const [swapError, setSwapError] = useState<string | null>(null);
   const fallbackTried = useRef(false);
 
   const selected = useMemo(() => mintById(selectedId), [selectedId]);
@@ -91,6 +95,8 @@ export default function Page() {
           slippageBps: null,
           routeLabel: null,
           requestId: null,
+          transaction: null,
+          orderHost: null,
           error: message,
           usingLite: false,
           needsApiKey: false,
@@ -101,6 +107,62 @@ export default function Page() {
     },
     [taker]
   );
+
+  const executeSwap = useCallback(async () => {
+    if (!taker || !signTransaction) {
+      setSwapError("Connect a wallet that can sign");
+      setSwapState("ERROR");
+      return;
+    }
+    const row = mintById(selectedId);
+    setSwapState("SIGNING");
+    setSwapError(null);
+    setSignature(null);
+    try {
+      const order = await loadQuote(row.mint, taker);
+      if (order.outAmount) {
+        setQuote(order);
+        setQuoteState("OK");
+      }
+      if (!order.transaction || !order.requestId) {
+        setSwapState("ERROR");
+        setSwapError(order.error ?? "quote has no transaction — reconnect wallet");
+        return;
+      }
+      const tx = decodeOrderTx(order.transaction);
+      const signed = await signTransaction(tx);
+      const signedB64 = encodeSignedTx(signed);
+      setSwapState("EXECUTING");
+      const res = await fetch("/api/ultra/execute", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          signedTransaction: signedB64,
+          requestId: order.requestId,
+          outputMint: row.mint,
+          host: order.orderHost,
+        }),
+      });
+      const result = (await res.json()) as UltraExecuteResult;
+      if (result.status === "Success" && result.signature) {
+        setSignature(result.signature);
+        setSwapState("LANDED");
+        return;
+      }
+      setSwapError(result.error ?? "execute failed");
+      setSwapState("ERROR");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "swap failed";
+      setSwapError(message);
+      setSwapState("ERROR");
+    }
+  }, [taker, signTransaction, selectedId]);
+
+  useEffect(() => {
+    setSwapState("IDLE");
+    setSwapError(null);
+    setSignature(null);
+  }, [selectedId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -169,6 +231,11 @@ export default function Page() {
         quote={quote}
         premBps={prices[selected.mint]?.premBps ?? null}
         stale={prices[selected.mint]?.stale ?? false}
+        connected={Boolean(publicKey)}
+        swapState={swapState}
+        signature={signature}
+        swapError={swapError}
+        onExecute={() => void executeSwap()}
       />
 
       <p className="disclaimer">
